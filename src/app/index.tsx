@@ -3,84 +3,88 @@
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { Link, Stack } from "expo-router";
-import { MoonStarIcon, StarIcon, SunIcon } from "lucide-react-native";
-import { useColorScheme } from "nativewind";
-import * as React from "react";
-import { Image, View, type ImageStyle } from "react-native";
+import { cn } from "@/lib/utils";
+import { Stack } from "expo-router";
+import { Mic, MoreVertical, Settings } from "lucide-react-native";
+import React from "react";
+import { FlatList, View } from "react-native";
 
-const LOGO = {
-	light: require("@/assets/images/react-native-reusables-light.png"),
-	dark: require("@/assets/images/react-native-reusables-dark.png"),
-};
+const DATA = [
+	{
+		id: "1",
+		text: "Hello, I'm kachi. Tell me things you can do. Tell me things that you can do. Hello, I'm kachi. Tell me things you can do. Tell me things that you can do. Hello, I'm kachi. Tell me things you can do. Tell me things that you can do.",
+		from: "me",
+	},
+	{
+		id: " 2",
+		text: "Hello, I'm kachi. Tell me things you can do. Tell me things that you can do. Hello, I'm kachi. Tell me things you can do. Tell me things that you can do. Hello, I'm kachi. Tell me things you can do. Tell me things that you can do.",
+		from: "them",
+	},
+	{
+		id: "3",
+		text: "Hello, I'm kachi. Tell me things you can do. Tell me things that you can do. Hello, I'm kachi. Tell me things you can do. Tell me things that you can do. Hello, I'm kachi. Tell me things you can do. Tell me things that you can do.",
+		from: "me",
+	},
+	{
+		id: "4",
+		text: "Hello, I'm kachi. Tell me things you can do. Tell me things that you can do. Hello, I'm kachi. Tell me things you can do. Tell me things that you can do. Hello, I'm kachi. Tell me things you can do. Tell me things that you can do.",
+		from: "them",
+	},
+];
 
-const SCREEN_OPTIONS = {
-	title: "React Native Reusables",
-	headerTransparent: true,
-	headerRight: () => <ThemeToggle />,
-};
+const ModalButton = ({
+	className,
+	...props
+}: React.ComponentProps<typeof Button>) => (
+	<Button
+		{...props}
+		className={cn("aspect-square h-fit", className)}
+		variant={"ghost"}
+	/>
+);
 
-const IMAGE_STYLE: ImageStyle = {
-	height: 76,
-	width: 76,
-};
+const ModalButtonIcon = ({
+	className,
+	...props
+}: React.ComponentProps<typeof Icon>) => <Icon size={32} {...props} />;
 
-export default function Screen() {
-	const { colorScheme } = useColorScheme();
-
+export default function Home() {
 	return (
 		<>
-			<Stack.Screen options={SCREEN_OPTIONS} />
-			<View className="flex-1 items-center justify-center gap-8 p-4">
-				<Image
-					source={LOGO[colorScheme ?? "light"]}
-					style={IMAGE_STYLE}
-					resizeMode="contain"
+			<Stack.Screen options={{ headerShown: false, title: "Chat" }} />
+			<View className="flex-1">
+				<FlatList
+					data={DATA}
+					contentContainerClassName="gap-4"
+					keyExtractor={(item) => item.id}
+					showsVerticalScrollIndicator={false}
+					renderItem={({ item }) => (
+						<Text
+							className={cn(
+								"max-w-[80%] rounded-2xl p-4",
+								item.from === "me"
+									? "self-end bg-primary"
+									: "self-start bg-secondary",
+							)}>
+							{item.text}
+						</Text>
+					)}
 				/>
-				<View className="gap-2 p-4">
-					<Text className="ios:text-foreground font-mono text-sm text-muted-foreground">
-						1. Edit <Text variant="code">app/index.tsx</Text> to get
-						started. Hey yoo
-					</Text>
-					<Text className="ios:text-foreground font-mono text-sm text-muted-foreground">
-						2. Save to see your changes instantly.
-					</Text>
-				</View>
-				<View className="flex-row gap-2">
-					<Link href="https://reactnativereusables.com" asChild>
-						<Button>
-							<Text>Browse the Docs</Text>
-						</Button>
-					</Link>
-					<Link
-						href="https://github.com/founded-labs/react-native-reusables"
-						asChild>
-						<Button variant="ghost">
-							<Text>Star the Repo</Text>
-							<Icon as={StarIcon} />
-						</Button>
-					</Link>
+
+				<View className="flex-row items-end justify-between p-4">
+					<ModalButton>
+						<ModalButtonIcon as={Settings} />
+					</ModalButton>
+
+					<Button className="aspect-square h-fit self-center rounded-full bg-accent p-8 active:bg-accent/50">
+						<Icon as={Mic} size={52} />
+					</Button>
+
+					<ModalButton>
+						<ModalButtonIcon as={MoreVertical} />
+					</ModalButton>
 				</View>
 			</View>
 		</>
-	);
-}
-
-const THEME_ICONS = {
-	light: SunIcon,
-	dark: MoonStarIcon,
-};
-
-function ThemeToggle() {
-	const { colorScheme, toggleColorScheme } = useColorScheme();
-
-	return (
-		<Button
-			onPressIn={toggleColorScheme}
-			size="icon"
-			variant="ghost"
-			className="ios:size-9 rounded-full web:mx-4">
-			<Icon as={THEME_ICONS[colorScheme ?? "light"]} className="size-5" />
-		</Button>
 	);
 }
