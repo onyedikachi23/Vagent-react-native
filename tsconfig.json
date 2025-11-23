@@ -23,6 +23,7 @@
 		".expo/types/**/*.ts",
 		"expo-env.d.ts",
 		"nativewind-env.d.ts",
-		"tailwind.config.ts"
+		"tailwind.config.ts",
+		"eslint.config.js"
 	]
 }
