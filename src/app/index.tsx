@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
+import { PulseCircle } from "@/screens/home";
 import { Stack } from "expo-router";
 import { Mic, MoreVertical, Settings } from "lucide-react-native";
 import React from "react";
@@ -43,10 +44,9 @@ const ModalButton = ({
 	/>
 );
 
-const ModalButtonIcon = ({
-	className,
-	...props
-}: React.ComponentProps<typeof Icon>) => <Icon size={32} {...props} />;
+const ModalButtonIcon = (props: React.ComponentProps<typeof Icon>) => (
+	<Icon size={32} {...props} />
+);
 
 export default function Home() {
 	return (
@@ -76,7 +76,16 @@ export default function Home() {
 						<ModalButtonIcon as={Settings} />
 					</ModalButton>
 
-					<Button className="aspect-square h-fit self-center rounded-full bg-accent p-8 active:bg-accent/50">
+					<Button className="relative aspect-square h-fit self-center rounded-full bg-accent p-8 active:bg-accent/50">
+						{Array.from({ length: 3 }).map((_, index) => (
+							<PulseCircle
+								// eslint-disable-next-line @eslint-react/no-array-index-key
+								key={index}
+								index={index}
+								className="bg-accent"
+							/>
+						))}
+
 						<Icon as={Mic} size={52} />
 					</Button>
 
