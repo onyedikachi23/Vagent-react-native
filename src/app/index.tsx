@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
 import { PulseCircle } from "@/screens/home";
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { Mic, MoreVertical, Settings } from "lucide-react-native";
 import React from "react";
 import { FlatList, View } from "react-native";
@@ -72,9 +72,11 @@ export default function Home() {
 				/>
 
 				<View className="flex-row items-end justify-between p-4">
-					<ModalButton>
-						<ModalButtonIcon as={Settings} />
-					</ModalButton>
+					<Link href="/settings" asChild>
+						<ModalButton>
+							<ModalButtonIcon as={Settings} />
+						</ModalButton>
+					</Link>
 
 					<Button className="relative aspect-square h-fit self-center rounded-full bg-accent p-8 active:bg-accent/50">
 						{Array.from({ length: 3 }).map((_, index) => (

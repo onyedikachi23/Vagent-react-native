@@ -8,6 +8,7 @@ import { PortalHost } from "@rn-primitives/portal";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export {
@@ -22,7 +23,9 @@ export default function RootLayout() {
 		<ThemeProvider value={NAV_THEME[colorScheme ?? "light"]}>
 			<StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
 			<SafeAreaView className="flex-1 bg-background">
-				<Stack />
+				<GestureHandlerRootView>
+					<Stack />
+				</GestureHandlerRootView>
 			</SafeAreaView>
 
 			<PortalHost />
