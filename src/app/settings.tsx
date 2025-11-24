@@ -1,7 +1,8 @@
 /** @format */
 
 import { Text } from "@/components/ui/text";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import React from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -32,6 +33,8 @@ const BottomSheet = ({
 	const progress = useDerivedValue(() =>
 		withTiming(isOpen.value ? 0 : 1, { duration }),
 	);
+
+	// When the sheet is opened, reset dragTranslateY to 0
 	useAnimatedReaction(
 		() => isOpen.value,
 		(isOpenValue) => {
@@ -40,6 +43,7 @@ const BottomSheet = ({
 			}
 		},
 	);
+
 	const panGesture = Gesture.Pan()
 		.onUpdate((event) => {
 			// Only allow dragging down (positive Y)
@@ -102,15 +106,42 @@ const BottomSheet = ({
 
 export default function SettingsPage() {
 	const isOpen = useSharedValue(false);
+	React.useEffect(
+		function openSheetAfterRender() {
+			isOpen.value = true;
+		},
+		[isOpen],
+	);
 
+	const ANIMATION_DURATION = 500;
+	const router = useRouter();
 	const toggleSheet = () => {
-		isOpen.value = !isOpen.value;
+		const wasOpen = isOpen.value;
+		// eslint-disable-next-line react-hooks/immutability
+		isOpen.value = !wasOpen;
+		if (wasOpen) {
+			setTimeout(() => {
+				router.back();
+			}, ANIMATION_DURATION);
+		}
 	};
 	return (
 		<>
-			<Stack.Screen options={{ title: "Settings", headerShown: false }} />
-			<View className="relative flex-1 items-center justify-center">
-				<BottomSheet isOpen={isOpen} toggleSheet={toggleSheet}>
+			<Stack.Screen
+				options={{
+					title: "Settings",
+					headerShown: false,
+					contentStyle: { backgroundColor: "transparent" },
+					presentation: "transparentModal",
+					animation: "none",
+				}}
+			/>
+
+			<View className="relative flex-1 items-center justify-center bg-transparent">
+				<BottomSheet
+					isOpen={isOpen}
+					toggleSheet={toggleSheet}
+					duration={ANIMATION_DURATION}>
 					<Text className="text-lg font-medium">
 						This is the bottom sheet content.
 					</Text>
@@ -122,13 +153,6 @@ export default function SettingsPage() {
 						</Text>
 					</Pressable>
 				</BottomSheet>
-				<Pressable
-					className="rounded-lg bg-slate-500 p-3"
-					onPress={toggleSheet}>
-					<Text className="p-2 text-white">
-						Toggle bottom sheetasdasdf
-					</Text>
-				</Pressable>
 			</View>
 		</>
 	);
