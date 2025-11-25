@@ -38,6 +38,13 @@
 					"configureAndroidBackup": true,
 					"faceIDPermission": "Allow Vagent to access your Face ID biometric data."
 				}
+			],
+			[
+				"expo-audio",
+				{
+					"microphonePermission": "Allow Vagent to access your microphone.",
+					"recordAudioAndroid": true
+				}
 			]
 		],
 		"experiments": {
