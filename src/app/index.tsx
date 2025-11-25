@@ -16,6 +16,9 @@ import { Link, Stack } from "expo-router";
 import { Mic, MoreVertical, Settings, Square } from "lucide-react-native";
 import React from "react";
 import { ActivityIndicator, Alert, FlatList, View } from "react-native";
+import { File } from "expo-file-system";
+import { useAuthCredentials } from "@/screens/auth-credentials-context";
+import axios from "axios";
 
 const DATA = [
 	{
@@ -57,7 +60,7 @@ const ModalButtonIcon = (props: React.ComponentProps<typeof Icon>) => (
 
 const RecordButton = () => {
 	const [recordingState, setRecordingState] = React.useState<
-		"idle" | "starting" | "recording"
+		"idle" | "starting" | "recording" | "stopping"
 	>("idle");
 
 	const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY!);
@@ -77,10 +80,43 @@ const RecordButton = () => {
 		}
 	};
 
+	const { credentials } = useAuthCredentials();
+
 	const stopRecording = async () => {
-		// The recording will be available on `audioRecorder.uri`.
-		await audioRecorder.stop();
-		setRecordingState("idle");
+		try {
+			setRecordingState("stopping");
+			// The recording will be available on `audioRecorder.uri`.
+			await audioRecorder.stop();
+			if (!audioRecorder.uri) {
+				throw new Error("No recording available");
+			}
+			if (!credentials?.apiKey) {
+				throw new Error("Api key not registered");
+			}
+			const file = new File(audioRecorder.uri);
+			const formData = new FormData();
+			formData.append("file", file);
+			formData.append("model", "whisper-1");
+			const transcription = await axios.post(
+				"https://api.openai.com/v1/audio/transcriptions",
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${credentials.apiKey}`,
+					},
+				},
+			);
+			console.log("transcription", transcription);
+
+			setRecordingState("idle");
+		} catch (error) {
+			setRecordingState("idle");
+			console.error("Error during stopRecording:", error);
+			Alert.alert(
+				"Error",
+				error instanceof Error ? error.message : String(error),
+			);
+		}
 	};
 
 	const onInitialLoad = useEffectEvent(async () => {
@@ -122,8 +158,9 @@ const RecordButton = () => {
 			}}>
 			{recordingState === "idle" && <Icon as={Mic} size={40} />}
 
-			{recordingState === "starting" && (
-				<ActivityIndicator className="fill-foreground" size={40} />
+			{(recordingState === "starting" ||
+				recordingState === "stopping") && (
+				<ActivityIndicator className="text-foreground" size={40} />
 			)}
 
 			{recordingState === "recording" && (
