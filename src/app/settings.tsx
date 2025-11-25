@@ -5,16 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
+import { useAuthCredentials } from "@/screens/auth-credentials-context";
 import { Stack, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import React from "react";
-import {
-	ActivityIndicator,
-	Pressable,
-	TextInput,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { Pressable, TextInput, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import Animated, {
@@ -141,8 +135,6 @@ const formConfigs = [
 	},
 ] satisfies { key: keyof AuthCredentials; label: string }[];
 
-const CREDENTIALS_STORAGE_KEY = "authCredentials";
-
 export default function SettingsScreen() {
 	const isOpen = useSharedValue(false);
 	React.useEffect(
@@ -156,6 +148,7 @@ export default function SettingsScreen() {
 	const router = useRouter();
 	const toggleSheet = () => {
 		const wasOpen = isOpen.value;
+		// eslint-disable-next-line react-hooks/immutability
 		isOpen.value = !wasOpen;
 		if (wasOpen) {
 			setTimeout(() => {
@@ -164,55 +157,22 @@ export default function SettingsScreen() {
 		}
 	};
 
-	const [form, setForm] = React.useState<AuthCredentials>({
-		sessionId: "",
-		apiKey: "",
-		webhookUrl: "",
-		webhookAuth: "",
-	});
+	const { credentials, setCredentials } = useAuthCredentials();
+	const [form, setForm] = React.useState<AuthCredentials>(
+		credentials ?? {
+			sessionId: "",
+			apiKey: "",
+			webhookUrl: "",
+			webhookAuth: "",
+		},
+	);
 	const inputsRef = React.useRef<
 		{ input: TextInput; key: keyof AuthCredentials }[]
 	>([]);
-	React.useEffect(() => {
-		async function loadCredentials() {
-			const sheetEnterPromise = new Promise<void>((resolve) =>
-				// eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout
-				setTimeout(resolve, ANIMATION_DURATION),
-			);
-			const credentials = await SecureStore.getItemAsync(
-				CREDENTIALS_STORAGE_KEY,
-			);
-			if (credentials) {
-				const parsedCredentials = JSON.parse(
-					credentials,
-				) as AuthCredentials;
 
-				// Populate input fields directly to avoid UI lag
-				inputsRef.current.forEach(({ input, key }) => {
-					input.setNativeProps({ text: parsedCredentials[key] });
-				});
-
-				await sheetEnterPromise; // Wait for the sheet to finish entering to avoid UI flickering
-				setForm(parsedCredentials);
-			}
-		}
-		loadCredentials().catch(console.error);
-	}, []);
-
-	const [isSaving, setIsSaving] = React.useState(false);
-	const handleSaveCredentials = async () => {
-		setIsSaving(true);
-		try {
-			await SecureStore.setItemAsync(
-				CREDENTIALS_STORAGE_KEY,
-				JSON.stringify(form),
-			);
-			toggleSheet();
-		} catch (error) {
-			console.error("Error saving credentials:", error);
-		} finally {
-			setIsSaving(false);
-		}
+	const handleSaveCredentials = () => {
+		setCredentials(form);
+		toggleSheet();
 	};
 
 	return (
@@ -285,19 +245,8 @@ export default function SettingsScreen() {
 							</View>
 						);
 					})}
-					<Button
-						className="my-4"
-						onPress={() => void handleSaveCredentials()}
-						disabled={isSaving}>
-						{isSaving ? (
-							<>
-								<Text>Saving</Text>
-
-								<ActivityIndicator className="text-foreground" />
-							</>
-						) : (
-							<Text>Save</Text>
-						)}
+					<Button className="my-4" onPress={handleSaveCredentials}>
+						<Text>Save</Text>
 					</Button>
 				</KeyboardAwareScrollView>
 			</BottomSheet>

@@ -11,6 +11,7 @@ import { useColorScheme } from "nativewind";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { AuthCredentialsProvider } from "@/screens/auth-credentials-context";
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -26,7 +27,9 @@ export default function RootLayout() {
 				<StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
 				<SafeAreaView className="flex-1 bg-background">
 					<GestureHandlerRootView>
-						<Stack />
+						<AuthCredentialsProvider>
+							<Stack />
+						</AuthCredentialsProvider>
 					</GestureHandlerRootView>
 				</SafeAreaView>
 
