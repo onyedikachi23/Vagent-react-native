@@ -1,38 +1,47 @@
 {
-  "expo": {
-    "name": "vagent-react-native",
-    "slug": "vagent-react-native",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./src/assets/images/icon.png",
-    "scheme": "vagent-react-native",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./src/assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": ["**/*"],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "edgeToEdgeEnabled": true,
-      "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.onyedikachi23.vagentreactnative"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./src/assets/images/favicon.png"
-    },
-    "plugins": ["expo-router"],
-    "experiments": {
-      "typedRoutes": true
-    }
-  }
+	"expo": {
+		"name": "vagent-react-native",
+		"slug": "vagent-react-native",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./src/assets/images/icon.png",
+		"scheme": "vagent-react-native",
+		"userInterfaceStyle": "automatic",
+		"newArchEnabled": true,
+		"splash": {
+			"image": "./src/assets/images/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"edgeToEdgeEnabled": true,
+			"adaptiveIcon": {
+				"foregroundImage": "./src/assets/images/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			},
+			"package": "com.onyedikachi23.vagentreactnative"
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static",
+			"favicon": "./src/assets/images/favicon.png"
+		},
+		"plugins": [
+			"expo-router",
+			[
+				"expo-secure-store",
+				{
+					"configureAndroidBackup": true,
+					"faceIDPermission": "Allow Vagent to access your Face ID biometric data."
+				}
+			]
+		],
+		"experiments": {
+			"typedRoutes": true
+		}
+	}
 }
