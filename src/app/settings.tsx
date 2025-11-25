@@ -1,10 +1,15 @@
 /** @format */
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
 import { Stack, useRouter } from "expo-router";
 import React from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import Animated, {
 	SharedValue,
 	useAnimatedReaction,
@@ -22,11 +27,13 @@ const BottomSheet = ({
 	toggleSheet,
 	duration = 500,
 	children,
+	className,
 }: {
 	isOpen: SharedValue<boolean>;
 	toggleSheet: () => void;
 	duration?: number;
 	children: React.ReactNode;
+	className?: string;
 }) => {
 	const height = useSharedValue(0);
 	const dragTranslateY = useSharedValue(0);
@@ -86,9 +93,10 @@ const BottomSheet = ({
 				onLayout={(e) => {
 					height.value = e.nativeEvent.layout.height;
 				}}
-				className={
-					"absolute bottom-0 z-10 w-full items-center justify-center rounded-tl-3xl rounded-tr-3xl bg-popover px-8 pb-4"
-				}
+				className={cn(
+					"absolute bottom-0 z-10 w-full rounded-tl-3xl rounded-tr-3xl bg-popover px-8 pb-4",
+					className,
+				)}
 				style={[sheetStyle]}>
 				<GestureDetector gesture={panGesture}>
 					<Animated.View>
@@ -103,6 +111,21 @@ const BottomSheet = ({
 		</>
 	);
 };
+
+const formConfigs = [
+	{
+		key: "apiKey",
+		label: "OpenAI API Key",
+	},
+	{
+		key: "webhookUrl",
+		label: "Webhook URL",
+	},
+	{
+		key: "webhookAuth",
+		label: "Webhook Header Auth Value (Key: Authorization)",
+	},
+] satisfies { key: string; label: string }[];
 
 export default function SettingsPage() {
 	const isOpen = useSharedValue(false);
@@ -137,23 +160,31 @@ export default function SettingsPage() {
 				}}
 			/>
 
-			<View className="relative flex-1 items-center justify-center bg-transparent">
-				<BottomSheet
-					isOpen={isOpen}
-					toggleSheet={toggleSheet}
-					duration={ANIMATION_DURATION}>
-					<Text className="text-lg font-medium">
-						This is the bottom sheet content.
-					</Text>
-					<Pressable
-						className="rounded-lg bg-slate-500 p-3"
-						onPress={toggleSheet}>
-						<Text className="p-2 text-white">
-							Toggle bottom sheetasdasdf
-						</Text>
-					</Pressable>
-				</BottomSheet>
-			</View>
+			<BottomSheet
+				isOpen={isOpen}
+				toggleSheet={toggleSheet}
+				duration={ANIMATION_DURATION}>
+				<Text className="my-6 text-2xl font-medium">Settings</Text>
+
+				<KeyboardAwareScrollView
+					contentContainerClassName="flex-1 gap-4"
+					extraKeyboardSpace={-65}>
+					{formConfigs.map(({ key, label }) => {
+						return (
+							<View key={key} className="gap-2">
+								<Label nativeID={`${key}-label`}>{label}</Label>
+								<Input
+									aria-labelledby={`${key}-label`}
+									className="border-ring focus:border-2 focus:border-popover-foreground"
+								/>
+							</View>
+						);
+					})}
+					<Button className="my-4">
+						<Text>Save</Text>
+					</Button>
+				</KeyboardAwareScrollView>
+			</BottomSheet>
 		</>
 	);
 }
